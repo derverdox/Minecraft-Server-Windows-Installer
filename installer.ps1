@@ -2,6 +2,8 @@
 $ConfigDatei = "config.json"
 $StandardValues = @{
     "minecraftVersion" = "1.20.4"
+    "javaArgs" = "-Dfile.encoding=UTF8 -Xmx4G"
+    "mcArgs" = "--nogui"
 }
 
 # Überprüfen, ob die Konfigurationsdatei existiert
@@ -10,13 +12,16 @@ if (Test-Path $ConfigDatei -PathType Leaf) {
     $config = Get-Content -Path $ConfigDatei | ConvertFrom-Json
 } else {
     # Verwende Standardwerte, wenn die Konfigurationsdatei nicht existiert
-    $config = $StandardValues | ConvertTo-Json -Depth 1 | Out-File -FilePath $ConfigDatei
+    $StandardValues | ConvertTo-Json -Depth 1 | Out-File -FilePath $ConfigDatei
+    $config = Get-Content -Path $ConfigDatei | ConvertFrom-Json
 }
 
 
 
 # Definieren der Variablen
 $VERSION = $config.minecraftVersion
+$JAVA_ARGS = $config.javaArgs
+$MC_ARGS = $config.mcArgs
 $SERVER_JAR_PATH = "server.jar"
 
 
@@ -74,7 +79,7 @@ if (-Not (Test-Path $SERVER_JAR_PATH)) {
     }
 }
 
-& $JDK_JAR_PATH -jar $SERVER_JAR_PATH
+& $JDK_JAR_PATH $JAVA_ARGS -jar $SERVER_JAR_PATH $MC_ARGS
 
 # Pause in PowerShell
 Write-Host "Press any key to continue ..."
